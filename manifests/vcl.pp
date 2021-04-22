@@ -4,19 +4,39 @@
 # If the VCL fails to parse, the exec will fail
 # and Varnish will continue to run with the old config
 define varnish::vcl (
-  $content,
-  $file = $name
+  $content = undef,
+  $source  = undef,
+  $file    = $name
 ) {
+
+  if $content == undef and $source == undef {
+    fail("You need exactly one non-empty content or source parameter")
+  }
+
+  if $content != undef and $source != undef {
+    fail("You need exactly one non-empty content or source parameter")
+  }
 
   include ::varnish
   include ::varnish::params
 
-  file { $file:
-    content => $content,
+  File {
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
     require => Class['varnish::install'],
     notify  => Exec['vcl_reload'],
+  }
+
+  if $content {
+    file { $file:
+      content => $content
+    }
+  }
+
+  if $source {
+    file { $file:
+      source => $source
+    }
   }
 }
