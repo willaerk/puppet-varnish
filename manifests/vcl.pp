@@ -17,8 +17,8 @@ define varnish::vcl (
     fail("You need exactly one non-empty content or source parameter")
   }
 
-  include varnish
-  include varnish::params
+  include ::varnish
+  include ::varnish::params
 
   File {
     owner   => 'root',
